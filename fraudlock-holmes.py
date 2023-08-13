@@ -10,7 +10,7 @@ data = pd.read_csv('creditcard.csv')
 
 # Print the shape of the data
 #data = data.sample(frac=0.1, random_state = 1)
-# print(data.shape)
+print(data.shape)
 
 # print(data["Amount"].describe())
 
@@ -56,7 +56,6 @@ y = data['Class']
 # Create the training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
-
 # Create the scaler
 scaler = StandardScaler()
 
@@ -67,12 +66,12 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
 
-# Create the model
-from sklearn.ensemble import IsolationForest
-model = IsolationForest(n_estimators=100, max_samples=len(X_train), contamination=outlier_fraction, random_state=1)
+# Create the SGD Classifier model
+from sklearn.linear_model import SGDClassifier
+model = SGDClassifier(loss='log_loss')
 
 # Fit the model
-model.fit(X_train)
+model.fit(X_train, y_train)
 
 # Predictions
 y_pred = model.predict(X_test)
@@ -101,28 +100,5 @@ sns.heatmap(conf_matrix, xticklabels=LABELS, yticklabels=LABELS, annot=True, fmt
 plt.title("Confusion matrix")
 plt.ylabel('True class')
 plt.xlabel('Predicted class')
-plt.show()
-
-# Plot the ROC curve
-from sklearn.metrics import roc_auc_score, roc_curve
-fpr, tpr, thresholds = roc_curve(y_test, y_pred)
-roc_auc = roc_auc_score(y_test, y_pred)
-plt.figure(figsize=(14, 10))
-plt.plot(fpr, tpr, label='Isolation Forest (AUROC = %0.4f)' % roc_auc)
-plt.plot([0, 1], [0, 1],'r--')
-plt.title('Receiver Operating Characteristic')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.legend(loc='lower right')
-plt.show()
-
-# Plot the precision-recall curve
-from sklearn.metrics import precision_recall_curve
-precision, recall, thresholds = precision_recall_curve(y_test, y_pred)
-plt.figure(figsize=(14, 10))
-plt.plot(recall, precision, label='Isolation Forest')
-plt.xlabel('Recall')
-plt.ylabel('Precision')
-plt.legend(loc='lower left')
 plt.show()
 
